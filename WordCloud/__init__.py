@@ -31,6 +31,9 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
     container_name = now.strftime("%Y%m")
     logging.info(f"container: {container_name}")
 
+    # prevent excessive logging
+    logging.getLogger('azure.core').setLevel(logging.WARNING)
+
     container = ContainerClient.from_connection_string(
         conn_str=connection_string, container_name=container_name)
     if not container.exists():
