@@ -1,7 +1,10 @@
 import logging
+import io
 import os
 from datetime import datetime, timedelta
 import azure.functions as func
+import matplotlib.pyplot as plt
+from wordcloud import WordCloud
 from azure.storage.blob import ContainerClient, ContentSettings, BlobSasPermissions, generate_blob_sas
 
 
@@ -13,7 +16,15 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
     if not words:
         return func.HttpResponse("No words", status_code=400)
 
-    logging.info(f"hash: {hash(words)}")
+    # TODO get these from params
+    height = 4
+    width = 4
+    dpi = 100
+
+    tuple = (words, height, width, dpi)
+    params_hash = abs(hash(tuple))
+
+    logging.info(f"hash: {params_hash}")
     connection_string = os.environ["AzureWebJobsStorage"]
     logging.info(f"connection string: {connection_string}")
     now = datetime.utcnow()
@@ -26,18 +37,38 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
         logging.info(f"create container: {container_name}")
         container.create_container()
 
-    blob_name = f"{abs(hash(words))}.txt"  # TODO png
+    blob_name = f"{params_hash}.png"
     logging.info(f"blob name: {blob_name}")
     blob = container.get_blob_client(blob=blob_name)
 
     if not blob.exists():
-        logging.info(f"create blob: {blob_name}")
-        # TODO the whole word cloud thing
-        # for now just this
-        blob.upload_blob(words, content_settings=ContentSettings(
-            content_type='text/plain'))
+        logging.info(f"create wordcloud blob: {blob_name}")
 
-    dict = {x[0]: x[1] for x in [x.split("=", maxsplit=1) for x in connection_string.split(";")]}
+        # https://matplotlib.org/stable/tutorials/colors/colormaps.html
+        color = "lightblue"
+        colormap = "winter"
+        wordcloud = WordCloud(width=width * dpi, height=height * dpi,
+                              background_color=color, colormap=colormap)
+        image = wordcloud.generate(words)
+
+        plt.figure(figsize=(width, height))
+
+        # hide axes https://gist.github.com/kylemcdonald/bedcc053db0e7843ef95c531957cb90f
+        ax = plt.axes([0, 0, 1, 1], frameon=False)
+        ax.get_xaxis().set_visible(False)
+        ax.get_yaxis().set_visible(False)
+
+        plt.imshow(image, interpolation='bilinear')
+
+        fp = io.BytesIO()
+        plt.savefig(fp)
+
+        # save image to blob
+        blob.upload_blob(fp.getvalue(),
+                         content_settings=ContentSettings(content_type="image/png"))
+
+    dict = {x[0]: x[1] for x in [
+        x.split("=", maxsplit=1) for x in connection_string.split(";")]}
     logging.info(f"parsed connection string: {dict}")
     account_key = dict["AccountKey"]
     logging.info(f"account_key: {account_key}")
