@@ -7,3 +7,6 @@ An Azure Function that displays a word cloud
 python -m venv .venv
 source .venv/bin/activate
 ```
+
+It's deployed here:  
+[`https://wordcloud-azure-function.azurewebsites.net/api/WordCloud?words=hello world`](https://wordcloud-azure-function.azurewebsites.net/api/WordCloud?words=hello%20world)
