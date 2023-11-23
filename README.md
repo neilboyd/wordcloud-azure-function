@@ -1,5 +1,7 @@
 # wordcloud-azure-function
-An Azure Function that displays a word cloud
+
+An Azure Function that displays a
+[word cloud](https://github.com/amueller/word_cloud).
 
 Run locally on Ubuntu 20 WSL.
 
