@@ -15,7 +15,8 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
     width = req.params.get("width")
     dpi = req.params.get("dpi")
     words = req.params.get("words")
-    logging.info(f"from params: height: {height}, width: {width}, dpi:{ dpi}, words: {words}")
+    logging.info(
+        f"from params: height: {height}, width: {width}, dpi:{dpi}, words: {words}")
 
     try:
         req_body = req.get_json()
@@ -23,11 +24,16 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
         logging.info("no body")
         pass
     else:
-      if "height" in req_body: height = req_body["height"] 
-      if "width" in req_body: width = req_body["width"] 
-      if "dpi" in req_body: dpi = req_body["dpi"] 
-      if "words" in req_body: words = req_body["words"] 
-      logging.info(f"from body: height: {height}, width: {width}, dpi:{ dpi}, words: {words}")
+        if "height" in req_body:
+            height = req_body["height"]
+        if "width" in req_body:
+            width = req_body["width"]
+        if "dpi" in req_body:
+            dpi = req_body["dpi"]
+        if "words" in req_body:
+            words = req_body["words"]
+        logging.info(
+            f"from body: height: {height}, width: {width}, dpi:{ dpi}, words: {words}")
 
     if not words:
         return func.HttpResponse("No words", status_code=400)
@@ -35,7 +41,8 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
     height = int(height) if height else 4
     width = int(width) if width else 4
     dpi = int(dpi) if dpi else 100
-    logging.info(f"finally: height: {height}, width: {width}, dpi:{ dpi}, words: {words}")
+    logging.info(
+        f"height: {height}, width: {width}, dpi:{dpi}, words: {words}")
 
     tuple = (words, height, width, dpi)
     params_hash = abs(hash(tuple))
