@@ -1,0 +1,9 @@
+POST http://localhost:7071/api/WordCloud HTTP/1.1
+content-type: application/json
+
+{
+  "height": 4,
+  "width": 4,
+  "dpi": "100",
+  "words": "hello world"
+}
