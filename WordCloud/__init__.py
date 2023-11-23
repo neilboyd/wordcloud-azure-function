@@ -9,14 +9,11 @@ from azure.storage.blob import ContainerClient, ContentSettings, BlobSasPermissi
 
 
 def main(req: func.HttpRequest) -> func.HttpResponse:
-    logging.info("Python HTTP trigger function processed a request.")
 
     height = req.params.get("height")
     width = req.params.get("width")
     dpi = req.params.get("dpi")
     words = req.params.get("words")
-    logging.info(
-        f"from params: height: {height}, width: {width}, dpi:{dpi}, words: {words}")
 
     try:
         req_body = req.get_json()
@@ -32,8 +29,6 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
             dpi = req_body["dpi"]
         if "words" in req_body:
             words = req_body["words"]
-        logging.info(
-            f"from body: height: {height}, width: {width}, dpi:{ dpi}, words: {words}")
 
     if not words:
         return func.HttpResponse("No words", status_code=400)
@@ -47,12 +42,9 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
     tuple = (words, height, width, dpi)
     params_hash = abs(hash(tuple))
 
-    logging.info(f"hash: {params_hash}")
     connection_string = os.environ["AzureWebJobsStorage"]
-    logging.info(f"connection string: {connection_string}")
     now = datetime.utcnow()
     container_name = now.strftime("%Y%m")
-    logging.info(f"container: {container_name}")
 
     # prevent excessive logging
     logging.getLogger('azure.core').setLevel(logging.WARNING)
@@ -60,16 +52,12 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
     container = ContainerClient.from_connection_string(
         conn_str=connection_string, container_name=container_name)
     if not container.exists():
-        logging.info(f"create container: {container_name}")
         container.create_container()
 
     blob_name = f"{params_hash}.png"
-    logging.info(f"blob name: {blob_name}")
     blob = container.get_blob_client(blob=blob_name)
 
     if not blob.exists():
-        logging.info(f"create wordcloud blob: {blob_name}")
-
         # https://matplotlib.org/stable/tutorials/colors/colormaps.html
         color = "lightblue"
         colormap = "winter"
@@ -95,9 +83,7 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
 
     dict = {x[0]: x[1] for x in [
         x.split("=", maxsplit=1) for x in connection_string.split(";")]}
-    logging.info(f"parsed connection string: {dict}")
     account_key = dict["AccountKey"]
-    logging.info(f"account_key: {account_key}")
 
     sas_blob = generate_blob_sas(account_name=blob.account_name,
                                  container_name=container_name,
@@ -105,7 +91,6 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
                                  account_key=account_key,
                                  permission=BlobSasPermissions(read=True),
                                  expiry=now + timedelta(hours=1))
-    logging.info(f"sas_blob: {sas_blob}")
     url = blob.url + "?" + sas_blob
-    logging.info(f"url: {url}")
+    logging.info(f"redirect to: {url}")
     return func.HttpResponse(url, headers={'Location': url}, status_code=302)
