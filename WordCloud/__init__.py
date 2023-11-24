@@ -90,7 +90,7 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
                                  blob_name=blob_name,
                                  account_key=account_key,
                                  permission=BlobSasPermissions(read=True),
-                                 expiry=now + timedelta(hours=1))
+                                 expiry=now + timedelta(weeks=4))
     url = blob.url + "?" + sas_blob
     logging.info(f"redirect to: {url}")
     return func.HttpResponse(url, headers={'Location': url}, status_code=302)
