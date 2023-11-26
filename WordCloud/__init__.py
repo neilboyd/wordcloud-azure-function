@@ -39,6 +39,9 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
     logging.info(
         f"height: {height}, width: {width}, dpi:{dpi}, words: {words}")
 
+    if height * width * dpi > 12 * 12 * 100:  # square foot
+        return func.HttpResponse("Image size too large", status_code=400)
+
     tuple = (words, height, width, dpi)
     params_hash = abs(hash(tuple))
 
