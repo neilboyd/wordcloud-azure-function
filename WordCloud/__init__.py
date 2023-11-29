@@ -10,10 +10,12 @@ from azure.storage.blob import ContainerClient, ContentSettings, BlobSasPermissi
 
 def main(req: func.HttpRequest) -> func.HttpResponse:
 
+    words = req.params.get("words")
     height = req.params.get("height")
     width = req.params.get("width")
     dpi = req.params.get("dpi")
-    words = req.params.get("words")
+    color = req.params.get("color")
+    colormap = req.params.get("colormap")
 
     try:
         req_body = req.get_json()
@@ -21,14 +23,18 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
         logging.info("no body")
         pass
     else:
+        if "words" in req_body:
+            words = req_body["words"]
         if "height" in req_body:
             height = req_body["height"]
         if "width" in req_body:
             width = req_body["width"]
         if "dpi" in req_body:
             dpi = req_body["dpi"]
-        if "words" in req_body:
-            words = req_body["words"]
+        if "color" in req_body:
+            color = req_body["color"]
+        if "colormap" in req_body:
+            colormap = req_body["colormap"]
 
     if not words:
         return func.HttpResponse("No words", status_code=400)
@@ -36,13 +42,18 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
     height = int(height) if height else 4
     width = int(width) if width else 4
     dpi = int(dpi) if dpi else 100
+    if not color:
+        color = "lightblue"
+    if not colormap:
+        colormap = "winter"
+
     logging.info(
-        f"height: {height}, width: {width}, dpi:{dpi}, words: {words}")
+        f"height: {height}, width: {width}, dpi:{dpi}, color:{color}, colormap:{colormap}, words: {words}")
 
     if height * width * dpi > 12 * 12 * 100:  # square foot
         return func.HttpResponse("Image size too large", status_code=400)
 
-    tuple = (words, height, width, dpi)
+    tuple = (words, height, width, dpi, color, colormap)
     params_hash = abs(hash(tuple))
 
     connection_string = os.environ["AzureWebJobsStorage"]
@@ -61,9 +72,6 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
     blob = container.get_blob_client(blob=blob_name)
 
     if not blob.exists():
-        # https://matplotlib.org/stable/tutorials/colors/colormaps.html
-        color = "lightblue"
-        colormap = "winter"
         wordcloud = WordCloud(width=width * dpi, height=height * dpi,
                               background_color=color, colormap=colormap)
         image = wordcloud.generate(words)

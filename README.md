@@ -16,3 +16,5 @@ words | *required* | the words to use for the word cloud
 height | 4 | height in inches
 width | 4 | width in inches
 dpi | 100 | resolution: dots (pixels) per inch
+color | lightblue | background color
+colormap | winter | [Matplotlib colormap](https://matplotlib.org/stable/tutorials/colors/colormaps.html)
