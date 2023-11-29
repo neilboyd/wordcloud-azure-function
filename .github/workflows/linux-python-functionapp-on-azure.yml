@@ -1,7 +1,11 @@
 name: Deploy Python project to Azure Function App
 
 on:
-  [push]
+  push:
+    branches:
+      - main
+
+  workflow_dispatch:
 
 env:
   AZURE_FUNCTIONAPP_NAME: 'wordcloud-azure-function'
