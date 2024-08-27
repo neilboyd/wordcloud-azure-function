@@ -3,6 +3,8 @@
     "ms-azuretools.vscode-azurefunctions",
     "ms-python.autopep8",
     "ms-python.python",
-    "humao.rest-client"
+    "humao.rest-client",
+    "esbenp.prettier-vscode",
+    "github.vscode-github-actions"
   ]
 }
