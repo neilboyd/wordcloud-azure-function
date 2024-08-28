@@ -5,6 +5,7 @@
     "ms-python.python",
     "humao.rest-client",
     "esbenp.prettier-vscode",
-    "github.vscode-github-actions"
+    "github.vscode-github-actions",
+    "azurite.azurite"
   ]
 }
