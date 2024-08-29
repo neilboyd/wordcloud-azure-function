@@ -2,11 +2,18 @@
   "version": "0.2.0",
   "configurations": [
     {
-      "name": "Attach to Python Functions",
-      "type": "python",
+      "name": "Azure Functions",
+      "type": "debugpy",
       "request": "attach",
-      "port": 9091,
-      "preLaunchTask": "func: host start"
-    }
+      "connect": {
+        "host": "localhost",
+        "port": 9091
+      },
+      "preLaunchTask": "func: host start",
+      "presentation": {
+        "reveal": "always"
+      },
+      "justMyCode": false,
+    },
   ]
 }
