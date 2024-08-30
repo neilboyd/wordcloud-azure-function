@@ -8,23 +8,23 @@ on:
   workflow_dispatch:
 
 env:
-  AZURE_FUNCTIONAPP_NAME: 'wordcloud-azure-function'
+  AZURE_FUNCTIONAPP_NAME: wordcloud-azure-function
   AZURE_FUNCTIONAPP_PACKAGE_PATH: '.'
-  PYTHON_VERSION: '3.8'
+  PYTHON_VERSION: 3.9
 
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
     steps:
-    - name: 'Checkout GitHub Action'
-      uses: actions/checkout@v3
+    - name: Checkout GitHub Action
+      uses: actions/checkout@v4
 
     - name: Setup Python ${{ env.PYTHON_VERSION }} Environment
-      uses: actions/setup-python@v4
+      uses: actions/setup-python@v5
       with:
         python-version: ${{ env.PYTHON_VERSION }}
 
-    - name: 'Resolve Project Dependencies Using Pip'
+    - name: Resolve Project Dependencies Using Pip
       shell: bash
       run: |
         pushd './${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH }}'
@@ -32,7 +32,7 @@ jobs:
         pip install -r requirements.txt --target=".python_packages/lib/site-packages"
         popd
 
-    - name: 'Run Azure Functions Action'
+    - name: Run Azure Functions Action
       uses: Azure/functions-action@v1
       id: fa
       with:
