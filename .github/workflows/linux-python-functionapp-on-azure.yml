@@ -4,13 +4,14 @@ on:
   push:
     branches:
       - main
+      - python-3.11
 
   workflow_dispatch:
 
 env:
   AZURE_FUNCTIONAPP_NAME: wordcloud-azure-function
   AZURE_FUNCTIONAPP_PACKAGE_PATH: '.'
-  PYTHON_VERSION: 3.9
+  PYTHON_VERSION: 3.11
 
 jobs:
   build-and-deploy:
